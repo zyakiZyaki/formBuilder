@@ -5,26 +5,26 @@
     <div class="valid" v-if="valid === false">Ошибка валидации</div>
     <form ref="form">
       <form-input
-        :type="configParams.inputType"
-        :label="configParams.inputLabel"
+        :type="config.inputType"
+        :label="config.inputLabel"
         v-model="name"
       />
       <form-select
-        :label="configParams.selectLabel"
-        :options="configParams.selectOptions"
+        :label="config.selectLabel"
+        :options="config.selectOptions"
         v-model="select" 
       />
       <form-radio
-        :label="configParams.radioLabel"
-        :options="configParams.radioOptions"
+        :label="config.radioLabel"
+        :options="config.radioOptions"
         v-model="radio"
       />
       <form-password
-        :label="configParams.passwordLabel"
+        :label="config.passwordLabel"
         v-model="password"
       />
       <form-repeat-password
-        :label="configParams.passwordRepeatLabel"
+        :label="config.passwordRepeatLabel"
         v-model="repeatPassword"
       />
       <button type="submit" @click.prevent="onSubmit()">Отправить</button>
@@ -55,7 +55,7 @@ export default {
       radio: '',
       password: '',
       repeatPassword: '',
-      configParams: {},
+      config: {},
       valid: true
     }
   },
@@ -73,14 +73,14 @@ export default {
 
     // Записываем данные
 
-    this.configParams.inputType = path.items[0].type
-    this.configParams.inputLabel = path.items[0].label
-    this.configParams.selectLabel = path.items[1].label
-    this.configParams.selectOptions = path.items[1].additional.options
-    this.configParams.radioLabel = path.items[2].label
-    this.configParams.radioOptions = path.items[2].additional.options
-    this.configParams.passwordLabel = path.items[3].label
-    this.configParams.passwordRepeatLabel = path.items[4].label
+    this.config.inputType = path.items[0].type
+    this.config.inputLabel = path.items[0].label
+    this.config.selectLabel = path.items[1].label
+    this.config.selectOptions = path.items[1].additional.options
+    this.config.radioLabel = path.items[2].label
+    this.config.radioOptions = path.items[2].additional.options
+    this.config.passwordLabel = path.items[3].label
+    this.config.passwordRepeatLabel = path.items[4].label
   },
 
   methods: {
