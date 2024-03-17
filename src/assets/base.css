@@ -1,8 +1,7 @@
 body {
-  display: flex;
   box-sizing: border-box;
   margin: 0 auto;
-  width: 350px;
+  width: 300px;
 }
 .form-builder {
   background-color: azure;
