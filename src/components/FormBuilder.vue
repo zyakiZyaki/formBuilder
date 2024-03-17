@@ -73,14 +73,14 @@ export default {
 
     // Записываем данные
 
-    this.config.inputType = path.items[0].type
-    this.config.inputLabel = path.items[0].label
-    this.config.selectLabel = path.items[1].label
-    this.config.selectOptions = path.items[1].additional.options
-    this.config.radioLabel = path.items[2].label
-    this.config.radioOptions = path.items[2].additional.options
-    this.config.passwordLabel = path.items[3].label
-    this.config.passwordRepeatLabel = path.items[4].label
+    this.config = {
+      inputType: path.items[0].type,
+      selectLabel: path.items[1].label,
+      selectOptions: path.items[1].additional.options,
+      radioLabel: path.items[2].label,
+      passwordLabel: path.items[3].label,
+      passwordRepeatLabel: path.items[4].label
+    }
   },
 
   methods: {
