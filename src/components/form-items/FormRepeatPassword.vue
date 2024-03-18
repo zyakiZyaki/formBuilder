@@ -9,8 +9,6 @@
 
 import FormInput from "@/components/form-items/FormInput.vue";
 
-import { mapMutations } from "vuex";
-
 export default {
   name: "FormRepeatPassword",
   props: {
