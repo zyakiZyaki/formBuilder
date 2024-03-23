@@ -41,13 +41,16 @@ export default {
   async created() {
 
     // Запрос на сервер с файлом конфига
+
     const response = await fetch('./form-config.json')
     const data = await response.json()
 
     // Копируем, чтобы удобнее работать с this
+
     this.config = { ...data }
 
     // Подготавливаем каркас формы отправки данных
+
     this.addFormsToData()
 
   },
@@ -55,6 +58,7 @@ export default {
   computed: {
     
     // Получаем ключи из конфига - название форм
+
     forms() {
       return Object.keys(this.config)
     },
@@ -63,6 +67,7 @@ export default {
   methods: {
 
     // Cоздаем каркас формы отправки
+
     addFormsToData() {
       this.forms.forEach(item => {
         this.data[item] = {}
@@ -70,6 +75,7 @@ export default {
     },
 
     //Динамически называем компонент
+
     normalizeFormName(name) {
       return 'Form' + name[0].toUpperCase() + name.slice(1)
     },
@@ -77,6 +83,7 @@ export default {
     validation() {
 
     // Выбираем ветку
+
       for (const form of Object.values(this.data)) {
         if (Object.keys(form).length === 0
           || form['pass'] === undefined
@@ -90,6 +97,7 @@ export default {
         }
 
     // Удаляем из формы repeat-pass
+
         else {
           delete form['repeat-pass']
         }
@@ -99,11 +107,13 @@ export default {
     onSubmit() {
 
     // Валидация
+
       if (this.validation() === false) {
         return
       }
 
     // Отправка запроса
+
       fetch('https://foo.bar', {
         method: 'POST',
         headers: {
@@ -118,6 +128,7 @@ export default {
   watch: {
 
     //При глубоком изменении data сбрасываем валидацию
+
     data: {
       handler() {
         this.valid = true
