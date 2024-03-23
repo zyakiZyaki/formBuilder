@@ -82,7 +82,7 @@ export default {
 
     validation() {
 
-    // Выбираем ветку
+    // Выбираем ветку и валидируем
 
       for (const form of Object.values(this.data)) {
         if (Object.keys(form).length === 0
