@@ -1,34 +1,23 @@
 <template>
   <div class="form-builder">
-    <!-- Должно собираться автоматически, а не руками как сейчас, согласно конфигу   -->
-    <h1>{{ type }}</h1>
     <div class="valid" v-if="valid === false">Ошибка валидации</div>
-    <form ref="form">
-      <form-input
-        :type="config.inputType"
-        :label="config.inputLabel"
-        v-model="name"
+
+    <!-- Должно собираться автоматически, а не руками как сейчас, согласно конфигу   -->
+
+    <form v-for="form in this.forms" @submit.prevent="onSubmit" :ref="form" :key="form">
+
+      <h1>{{ form }}</h1>
+
+      <component
+        v-for="(component, index) in this.config[`${form}`].items"
+        :type="component.type"
+        :label="component.label" :options="component.additional?.options" :key="index"
+        :is="normalizeFormName(component.type)" @modelValue="data[form][component.name] = $event"
       />
-      <form-select
-        :label="config.selectLabel"
-        :options="config.selectOptions"
-        v-model="select" 
-      />
-      <form-radio
-        :label="config.radioLabel"
-        :options="config.radioOptions"
-        v-model="radio"
-      />
-      <form-password
-        :label="config.passwordLabel"
-        v-model="password"
-      />
-      <form-repeat-password
-        :label="config.passwordRepeatLabel"
-        v-model="repeatPassword"
-      />
-      <button type="submit" @click.prevent="onSubmit()">Отправить</button>
+
+      <button type="submit">Отправить</button>
       <button type="reset">Стереть</button>
+
     </form>
   </div>
 </template>
@@ -38,23 +27,12 @@ import FormInput from "@/components/form-items/FormInput.vue";
 import FormSelect from "@/components/form-items/FormSelect.vue";
 import FormRadio from "@/components/form-items/FormRadio.vue";
 import FormPassword from "@/components/form-items/FormPassword.vue";
-import FormRepeatPassword from "@/components/form-items/FormRepeatPassword.vue";
 
 export default {
   name: "FormBuilder",
-  props: {
-    type: {
-      type: String,
-      default: 'parent'
-    }
-  },
   data() {
     return {
-      name: '',
-      select: '',
-      radio: '',
-      password: '',
-      repeatPassword: '',
+      data: {},
       config: {},
       valid: true
     }
@@ -62,82 +40,94 @@ export default {
 
   async created() {
 
-    // Создаем запрос
-
+    // Запрос на сервер с файлом конфига
     const response = await fetch('./form-config.json')
     const data = await response.json()
 
-    // Выбираем ветку по пропсу
+    // Копируем, чтобы удобнее работать с this
+    this.config = { ...data }
 
-    const path = await data[`${this.type}`]
+    // Подготавливаем каркас формы отправки данных
+    this.addFormsToData()
 
-    // Записываем данные
+  },
 
-    this.config = {
-      inputType: path.items[0].type,
-      selectLabel: path.items[1].label,
-      selectOptions: path.items[1].additional.options,
-      radioLabel: path.items[2].label,
-      passwordLabel: path.items[3].label,
-      passwordRepeatLabel: path.items[4].label
-    }
+  computed: {
+    
+    // Получаем ключи из конфига - название форм
+    forms() {
+      return Object.keys(this.config)
+    },
   },
 
   methods: {
 
+    // Cоздаем каркас формы отправки
+    addFormsToData() {
+      this.forms.forEach(item => {
+        this.data[item] = {}
+      })
+    },
+
+    //Динамически называем компонент
+    normalizeFormName(name) {
+      return 'Form' + name[0].toUpperCase() + name.slice(1)
+    },
+
     validation() {
-      if (this.password !== this.repeatPassword
-        || this.repeatPassword === ''
-        || this.password === ''
-        || this.select === ''
-        || this.radio === '') {
-        this.valid = false
-        return false
+
+    // Выбираем ветку
+      for (const form of Object.values(this.data)) {
+        if (Object.keys(form).length === 0
+          || form['pass'] === undefined
+          || form['repeat-pass'] === undefined) {
+          this.valid = false
+          return false
+        }
+        if (form['pass'] !== form['repeat-pass']) {
+          this.valid = false
+          return false
+        }
+
+    // Удаляем из формы repeat-pass
+        else {
+          delete form['repeat-pass']
+        }
       }
     },
 
     onSubmit() {
+
+    // Валидация
       if (this.validation() === false) {
         return
       }
-      const user = {}
-      user[`${this.type}`] = {
-        name: this.name,
-        gender: this.select,
-        age: this.radio,
-        pass: this.password,
-      }
 
+    // Отправка запроса
       fetch('https://foo.bar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(this.data)
       })
-      this.$refs.form.reset();
       alert('Данные отправлены!')
     }
   },
-  components: { FormPassword, FormRadio, FormSelect, FormInput, FormRepeatPassword },
+
   watch: {
-    name() {
-      this.valid = true
-    },
-    select() {
-      this.valid = true
-    },
-    password() {
-      this.valid = true
-    },
-    radio() {
-      this.valid = true
-    },
-    repeatPassword() {
-      this.valid = true
+
+    //При глубоком изменении data сбрасываем валидацию
+    data: {
+      handler() {
+        this.valid = true
+      },
+      deep: true
     }
-  }
+  },
+  components: { FormPassword, FormRadio, FormSelect, FormInput },
 }
+
 </script>
 
 <style scoped></style>
