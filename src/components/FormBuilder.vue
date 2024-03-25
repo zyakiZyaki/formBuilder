@@ -4,7 +4,7 @@
 
     <!-- Должно собираться автоматически, а не руками как сейчас, согласно конфигу   -->
 
-    <form v-for="form in this.forms" @submit.prevent="onSubmit" :ref="form" :key="form">
+    <form v-for="form in this.forms" @submit.prevent="onSubmit" :key="form">
 
       <h1>{{ form }}</h1>
 
